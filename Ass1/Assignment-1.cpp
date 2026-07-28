@@ -51,32 +51,6 @@ public:
         temp->next = newNode;
         return;
     }
-    void displayAllElements()
-    {
-        Node *temp = head;
-        while (temp != nullptr)
-        {
-            cout << temp->data << " ";
-            temp = temp->next;
-        }
-    }
-    void search(int key)
-    {
-        Node *temp = head;
-        int position = 1;
-        while (temp != nullptr)
-        {
-            if (temp->data == key)
-            {
-                cout << "Element of value " << key << " at position " << position;
-                return;
-            }
-            position++;
-            temp = temp->next;
-        }
-        cout << "Element not found in list";
-        return;
-    }
     void insertAtIndex(int value, int position)
     {
         if (position < 1)
@@ -105,6 +79,104 @@ public:
         newNode->next = temp->next;
         temp->next = newNode;
     }
+    void displayAllElements()
+    {
+        Node *temp = head;
+        while (temp != nullptr)
+        {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+    }
+    void search(int key)
+    {
+        Node *temp = head;
+        int position = 1;
+        while (temp != nullptr)
+        {
+            if (temp->data == key)
+            {
+                cout << "Element of value " << key << " at position " << position;
+                return;
+            }
+            position++;
+            temp = temp->next;
+        }
+        cout << "Element not found in list";
+        return;
+    }
+    void deleteAtEnd()
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+        if (head->next == nullptr)
+        {
+            delete head;
+            head = nullptr;
+            cout << "Last node deleted";
+            return;
+        }
+        Node *temp = head;
+
+        while ((temp->next)->next != nullptr)
+        {
+            temp = temp->next;
+        }
+        delete temp->next;
+        temp->next = nullptr;
+
+        cout << "Last node deleted";
+    }
+    void deleteAtBeginning()
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+
+        Node *temp = head;
+        head = head->next;
+        delete temp;
+        cout << "First node deleted";
+    }
+    void deleteAtIndex(int position)
+    {
+        if (position < 1)
+        {
+            cout << "Position is invalid\n";
+            return;
+        }
+
+        if (position == 1)
+        {
+            deleteAtBeginning();
+            return;
+        }
+
+        Node *temp = head;
+
+        for (int i = 0; i < position - 2 && temp != nullptr; i++)
+        {
+            temp = temp->next;
+        }
+
+        if (temp == nullptr || temp->next == nullptr)
+        {
+            cout << "Position is invalid\n";
+            return;
+        }
+
+        Node *nodeToDelete = temp->next;
+        temp->next = nodeToDelete->next;
+
+        delete nodeToDelete;
+
+        displayAllElements();
+    }
 };
 
 int main()
@@ -120,6 +192,8 @@ int main()
              << "\nEnter 3 for Adding Element At the Specific Index"
              << "\nEnter 4 for Displaying All Elements"
              << "\nEnter 5 for Searching an Element"
+             << "\nEnter 6 for Deleting the last node"
+             << "\nEnter 7 for Deleting at an Index"
              << "\nEnter 0 to Exit"
              << "\nChoice: ";
 
@@ -163,6 +237,17 @@ int main()
             cin >> data;
             linkList.search(data);
             break;
+
+        case 6:
+            linkList.deleteAtEnd();
+            break;
+
+        case 7:
+            cout << "Enter position to delete: ";
+            cin >> position;
+            linkList.deleteAtIndex(position);
+            break;
+
         default:
             cout << "Invalid input.\n";
         }

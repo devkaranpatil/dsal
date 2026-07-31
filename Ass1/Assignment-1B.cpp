@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 using namespace std;
 
 class Contact
@@ -34,29 +35,78 @@ class Contactlist
 private:
     Node *head;
 
+    bool hasDuplicatePhone(const string &phone) const
+    {
+        for (Node *temp = head; temp != nullptr; temp = temp->next)
+        {
+            if (temp->data.phone == phone)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool hasDuplicateEmail(const string &email) const
+    {
+        for (Node *temp = head; temp != nullptr; temp = temp->next)
+        {
+            if (temp->data.email == email)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool canAdd(const Contact &value) const
+    {
+        const bool duplicatePhone = hasDuplicatePhone(value.phone);
+        const bool duplicateEmail = hasDuplicateEmail(value.email);
+
+        if (duplicatePhone)
+        {
+            cout << "A contact with this phone number already exists.\n";
+        }
+        if (duplicateEmail)
+        {
+            cout << "A contact with this email already exists.\n";
+        }
+        return !duplicatePhone && !duplicateEmail;
+    }
+
 public:
     Contactlist()
     {
         head = nullptr;
     }
-    void insertAtBeginning(const Contact &value)
+    bool insertAtBeginning(const Contact &value)
     {
+        if (!canAdd(value))
+        {
+            return false;
+        }
         Node *newNode = new Node(value);
         if (head == nullptr)
         {
             head = newNode;
-            return;
+            return true;
         }
         newNode->next = head;
         head = newNode;
+        return true;
     }
-    void insertAtEnd(const Contact &value)
+    bool insertAtEnd(const Contact &value)
     {
+        if (!canAdd(value))
+        {
+            return false;
+        }
         Node *newNode = new Node(value);
         if (head == nullptr)
         {
             head = newNode;
-            return;
+            return true;
         }
         Node *temp = head;
         while (temp->next != nullptr)
@@ -64,21 +114,25 @@ public:
             temp = temp->next;
         }
         temp->next = newNode;
-        return;
+        return true;
     }
-    void insertAtIndex(const Contact &value, int position)
+    bool insertAtIndex(const Contact &value, int position)
     {
         if (position < 1)
         {
             cout << "Position is invalid";
-            return;
+            return false;
+        }
+        if (!canAdd(value))
+        {
+            return false;
         }
         Node *newNode = new Node(value);
         if (position == 1)
         {
             newNode->next = head;
             head = newNode;
-            return;
+            return true;
         }
         Node *temp = head;
         for (int i = 0; i < position - 2 && temp != nullptr; ++i)
@@ -89,10 +143,11 @@ public:
         {
             cout << "Position is invalid";
             delete newNode;
-            return;
+            return false;
         }
         newNode->next = temp->next;
         temp->next = newNode;
+        return true;
     }
     void displayAllContacts()
     {
@@ -106,8 +161,9 @@ public:
         while (temp != nullptr)
         {
             cout << "Name: " << temp->data.name << endl;
-            cout << "Phone Number: " << temp->data.name << endl;
+            cout << "Phone Number: " << temp->data.phone << endl;
             cout << "Email: " << temp->data.email << endl;
+            cout << endl;
             temp = temp->next;
         }
     }
@@ -230,6 +286,23 @@ public:
     }
 };
 
+void readContact(Contact &data)
+{
+    cout << "Enter Name : ";
+    getline(cin, data.name);
+
+    cout << "Enter Phone : ";
+    getline(cin, data.phone);
+
+    cout << "Enter Email : ";
+    getline(cin, data.email);
+}
+
+void discardLine()
+{
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
 int main()
 {
     int index = 1;
@@ -253,10 +326,17 @@ int main()
              << "\nEnter 0 to Exit" << endl;
 
         cout << "Choice: ";
-        cin >> index;
+        if (!(cin >> index))
+        {
+            cin.clear();
+            discardLine();
+            cout << "Invalid choice. Please enter a number between 0 and 9." << endl;
+            continue;
+        }
+        discardLine();
         if (index < 0 || index > 9)
         {
-            cout << "Invalid choice. Please enter a number between 0 and 8." << endl;
+            cout << "Invalid choice. Please enter a number between 0 and 9." << endl;
             continue;
         }
 
@@ -267,52 +347,41 @@ int main()
             break;
 
         case 1:
-            cout << "Enter Name : ";
-            getline(cin, data.name);
-
-            cout << "Enter Phone : ";
-            getline(cin, data.phone);
-
-            cout << "Enter Email : ";
-            getline(cin, data.email);
-            linkList.insertAtBeginning(data);
-            cout << "Contact Added";
+            readContact(data);
+            if (linkList.insertAtBeginning(data))
+            {
+                cout << "Contact Added";
+            }
             break;
 
         case 2:
-            cout << "Enter Name : ";
-            getline(cin >> ws, data.name);
-
-            cout << "Enter Phone : ";
-            getline(cin, data.phone);
-
-            cout << "Enter Email : ";
-            getline(cin, data.email);
-            linkList.insertAtEnd(data);
-            cout << "Contact Added";
+            readContact(data);
+            if (linkList.insertAtEnd(data))
+            {
+                cout << "Contact Added";
+            }
             break;
 
         case 3:
         {
             int position;
-            cout << "Enter Name : ";
-            getline(cin, data.name);
-
-            cout << "Enter Phone : ";
-            getline(cin, data.phone);
-
-            cout << "Enter Email : ";
-            getline(cin, data.email);
+            readContact(data);
             cout << "Enter position to insert: ";
-            cin >> position;
-            if (position < 1)
+            if (!(cin >> position))
+            {
+                cin.clear();
+                discardLine();
+                cout << "Position is invalid";
+            }
+            else if (position < 1)
             {
                 cout << "Position is invalid";
             }
-            else
+            else if (linkList.insertAtIndex(data, position))
             {
-                linkList.insertAtIndex(data, position);
+                cout << "Contact Added";
             }
+            discardLine();
             break;
         }
 
@@ -322,7 +391,7 @@ int main()
 
         case 5:
             cout << "Enter the name of contact to search: ";
-            cin >> data.name;
+            getline(cin, data.name);
             linkList.search(data.name);
             break;
 
@@ -338,8 +407,13 @@ int main()
         {
             int position;
             cout << "Enter position to delete: ";
-            cin >> position;
-            if (position < 1)
+            if (!(cin >> position))
+            {
+                cin.clear();
+                discardLine();
+                cout << "Position is invalid";
+            }
+            else if (position < 1)
             {
                 cout << "Position is invalid";
             }
@@ -347,6 +421,7 @@ int main()
             {
                 linkList.deleteAtIndex(position);
             }
+            discardLine();
             break;
         }
 

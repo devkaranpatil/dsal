@@ -81,6 +81,12 @@ public:
     }
     void displayAllElements()
     {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+
         Node *temp = head;
         while (temp != nullptr)
         {
@@ -90,20 +96,25 @@ public:
     }
     void search(int key)
     {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+
         Node *temp = head;
         int position = 1;
         while (temp != nullptr)
         {
             if (temp->data == key)
             {
-                cout << "Element of value " << key << " at position " << position;
+                cout << "Element of value " << key << " found at position " << position;
                 return;
             }
             position++;
             temp = temp->next;
         }
         cout << "Element not found in list";
-        return;
     }
     void deleteAtEnd()
     {
@@ -177,6 +188,29 @@ public:
 
         displayAllElements();
     }
+    void reverseList()
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+
+        Node *curr = head;
+        Node *prev = nullptr;
+        Node *nextNode = nullptr;
+
+        while (curr != nullptr)
+        {
+            nextNode = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+
+        head = prev;
+        displayAllElements();
+    }
 };
 
 int main()
@@ -192,12 +226,19 @@ int main()
              << "\nEnter 3 for Adding Element At the Specific Index"
              << "\nEnter 4 for Displaying All Elements"
              << "\nEnter 5 for Searching an Element"
-             << "\nEnter 6 for Deleting the last node"
-             << "\nEnter 7 for Deleting at an Index"
-             << "\nEnter 0 to Exit"
-             << "\nChoice: ";
+             << "\nEnter 6 for Deleting the first node"
+             << "\nEnter 7 for Deleting the last node"
+             << "\nEnter 8 for Deleting at an Index"
+             << "\nEnter 9 for Reversing A list"
+             << "\nEnter 0 to Exit" << endl;
 
+        cout << "Choice: ";
         cin >> index;
+        if (index < 0 || index > 9)
+        {
+            cout << "Invalid choice. Please enter a number between 0 and 8." << endl;
+            continue;
+        }
 
         switch (index)
         {
@@ -220,13 +261,22 @@ int main()
             break;
 
         case 3:
+        {
             int position;
             cout << "Enter the value to insert: ";
             cin >> data;
             cout << "Enter position to insert: ";
             cin >> position;
-            linkList.insertAtIndex(data, position);
+            if (position < 1)
+            {
+                cout << "Position is invalid";
+            }
+            else
+            {
+                linkList.insertAtIndex(data, position);
+            }
             break;
+        }
 
         case 4:
             linkList.displayAllElements();
@@ -239,13 +289,31 @@ int main()
             break;
 
         case 6:
-            linkList.deleteAtEnd();
+            linkList.deleteAtBeginning();
             break;
 
         case 7:
+            linkList.deleteAtEnd();
+            break;
+
+        case 8:
+        {
+            int position;
             cout << "Enter position to delete: ";
             cin >> position;
-            linkList.deleteAtIndex(position);
+            if (position < 1)
+            {
+                cout << "Position is invalid";
+            }
+            else
+            {
+                linkList.deleteAtIndex(position);
+            }
+            break;
+        }
+
+        case 9:
+            linkList.reverseList();
             break;
 
         default:

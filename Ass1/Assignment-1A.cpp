@@ -236,7 +236,7 @@ int main()
         cin >> index;
         if (index < 0 || index > 9)
         {
-            cout << "Invalid choice. Please enter a number between 0 and 8." << endl;
+            cout << "Invalid choice. Please enter a number between 0 and 9." << endl;
             continue;
         }
 

@@ -1,5 +1,6 @@
 #include <iostream>
-#include <limits>
+#include <string>
+#include <cctype>
 using namespace std;
 
 class Contact
@@ -9,7 +10,8 @@ public:
     string phone;
     string email;
 
-    Contact() {};
+    Contact() {}
+
     Contact(string n, string p, string e)
     {
         name = n;
@@ -25,417 +27,693 @@ public:
     Node *next;
 
     Node(const Contact &value)
-        : data(value), next(nullptr)
     {
+        data = value;
+        next = nullptr;
     }
 };
 
-class Contactlist
+class ContactList
 {
 private:
     Node *head;
 
-    bool hasDuplicatePhone(const string &phone) const
+    bool hasDuplicatePhone(const string &phone, Node *ignore = nullptr) const
     {
-        for (Node *temp = head; temp != nullptr; temp = temp->next)
+        Node *temp = head;
+
+        while (temp != nullptr)
         {
-            if (temp->data.phone == phone)
+            if (temp != ignore && temp->data.phone == phone)
             {
                 return true;
             }
+
+            temp = temp->next;
         }
+
         return false;
     }
 
-    bool hasDuplicateEmail(const string &email) const
+    bool hasDuplicateEmail(const string &email, Node *ignore = nullptr) const
     {
-        for (Node *temp = head; temp != nullptr; temp = temp->next)
+        Node *temp = head;
+
+        while (temp != nullptr)
         {
-            if (temp->data.email == email)
+            if (temp != ignore && temp->data.email == email)
             {
                 return true;
             }
+
+            temp = temp->next;
         }
+
         return false;
     }
 
-    bool canAdd(const Contact &value) const
+    bool isValidPhone(const string &phone) const
     {
-        const bool duplicatePhone = hasDuplicatePhone(value.phone);
-        const bool duplicateEmail = hasDuplicateEmail(value.email);
+        if (phone.length() != 10)
+        {
+            cout << "Phone number must contain exactly 10 digits.\n";
+            return false;
+        }
 
-        if (duplicatePhone)
+        for (char c : phone)
         {
-            cout << "A contact with this phone number already exists.\n";
+            if (!isdigit(c))
+            {
+                cout << "Phone number must contain only digits.\n";
+                return false;
+            }
         }
-        if (duplicateEmail)
+
+        return true;
+    }
+
+    bool isValidEmail(const string &email) const
+    {
+        size_t atPosition = email.find('@');
+        size_t dotPosition = email.rfind('.');
+
+        if (atPosition == string::npos)
         {
-            cout << "A contact with this email already exists.\n";
+            cout << "Email must contain '@'.\n";
+            return false;
         }
-        return !duplicatePhone && !duplicateEmail;
+
+        if (email.find('@', atPosition + 1) != string::npos)
+        {
+            cout << "Email can contain only one '@'.\n";
+            return false;
+        }
+
+        if (atPosition == 0)
+        {
+            cout << "Email must contain characters before '@'.\n";
+            return false;
+        }
+
+        if (dotPosition == string::npos ||
+            dotPosition < atPosition + 2)
+        {
+            cout << "Invalid email domain.\n";
+            return false;
+        }
+
+        if (dotPosition == email.length() - 1)
+        {
+            cout << "Invalid email extension.\n";
+            return false;
+        }
+
+        if (email.find(' ') != string::npos)
+        {
+            cout << "Email cannot contain spaces.\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    bool isValidName(const string &name) const
+    {
+        if (name.empty())
+        {
+            cout << "Name cannot be empty.\n";
+            return false;
+        }
+
+        for (char c : name)
+        {
+            if (!isalpha(c) && c != ' ')
+            {
+                cout << "Name can contain only alphabets and spaces.\n";
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void displayContact(const Contact &contact) const
+    {
+        cout << "Name  : " << contact.name << endl;
+        cout << "Phone : " << contact.phone << endl;
+        cout << "Email : " << contact.email << endl;
+    }
+
+    int countContactsByName(const string &name) const
+    {
+        int count = 0;
+
+        Node *temp = head;
+
+        while (temp != nullptr)
+        {
+            if (temp->data.name == name)
+            {
+                count++;
+            }
+
+            temp = temp->next;
+        }
+
+        return count;
     }
 
 public:
-    Contactlist()
+    ContactList()
     {
         head = nullptr;
     }
-    bool insertAtBeginning(const Contact &value)
+
+    void addContact()
     {
-        if (!canAdd(value))
+        Contact data;
+
+        do
         {
-            return false;
-        }
-        Node *newNode = new Node(value);
-        if (head == nullptr)
+            cout << "Enter Name: ";
+            getline(cin, data.name);
+        } while (!isValidName(data.name));
+
+        while (true)
         {
-            head = newNode;
-            return true;
+            cout << "Enter Phone: ";
+            getline(cin, data.phone);
+
+            if (!isValidPhone(data.phone))
+            {
+                continue;
+            }
+
+            if (hasDuplicatePhone(data.phone))
+            {
+                cout << "A contact with this phone number already exists.\n";
+                continue;
+            }
+
+            break;
         }
-        newNode->next = head;
-        head = newNode;
-        return true;
-    }
-    bool insertAtEnd(const Contact &value)
-    {
-        if (!canAdd(value))
+
+        while (true)
         {
-            return false;
+            cout << "Enter Email: ";
+            getline(cin, data.email);
+
+            if (!isValidEmail(data.email))
+            {
+                continue;
+            }
+
+            if (hasDuplicateEmail(data.email))
+            {
+                cout << "A contact with this email already exists.\n";
+                continue;
+            }
+
+            break;
         }
-        Node *newNode = new Node(value);
-        if (head == nullptr)
-        {
-            head = newNode;
-            return true;
-        }
-        Node *temp = head;
-        while (temp->next != nullptr)
-        {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-        return true;
-    }
-    bool insertAtIndex(const Contact &value, int position)
-    {
-        if (position < 1)
-        {
-            cout << "Position is invalid";
-            return false;
-        }
-        if (!canAdd(value))
-        {
-            return false;
-        }
-        Node *newNode = new Node(value);
-        if (position == 1)
+
+        Node *newNode = new Node(data);
+
+        if (head == nullptr ||
+            data.name < head->data.name)
         {
             newNode->next = head;
             head = newNode;
-            return true;
         }
-        Node *temp = head;
-        for (int i = 0; i < position - 2 && temp != nullptr; ++i)
+        else
         {
-            temp = temp->next;
-        }
-        if (temp == nullptr)
-        {
-            cout << "Position is invalid";
-            delete newNode;
-            return false;
-        }
-        newNode->next = temp->next;
-        temp->next = newNode;
-        return true;
-    }
-    void displayAllContacts()
-    {
-        if (head == nullptr)
-        {
-            cout << "List is empty";
-            return;
-        }
+            Node *temp = head;
 
-        Node *temp = head;
-        while (temp != nullptr)
-        {
-            cout << "Name: " << temp->data.name << endl;
-            cout << "Phone Number: " << temp->data.phone << endl;
-            cout << "Email: " << temp->data.email << endl;
-            cout << endl;
-            temp = temp->next;
-        }
-    }
-    void search(const string &key)
-    {
-        if (head == nullptr)
-        {
-            cout << "List is empty";
-            return;
-        }
-
-        Node *temp = head;
-        int position = 1;
-        while (temp != nullptr)
-        {
-            if (temp->data.name == key)
+            while (temp->next != nullptr &&
+                   temp->next->data.name <= data.name)
             {
-                cout << "Contact Name of " << key << " is found at position " << position;
+                temp = temp->next;
+            }
+
+            newNode->next = temp->next;
+            temp->next = newNode;
+        }
+
+        cout << "\nContact added successfully.\n";
+    }
+
+    void displayAllContacts() const
+    {
+        if (head == nullptr)
+        {
+            cout << "Contact list is empty.\n";
+            return;
+        }
+
+        Node *temp = head;
+        int count = 1;
+
+        cout << "\nCONTACTS\n";
+
+        while (temp != nullptr)
+        {
+            cout << "\nContact " << count << endl;
+            cout << "-----------------------------\n";
+
+            displayContact(temp->data);
+
+            temp = temp->next;
+            count++;
+        }
+    }
+
+    void search(const string &name) const
+    {
+        if (head == nullptr)
+        {
+            cout << "Contact list is empty.\n";
+            return;
+        }
+
+        Node *temp = head;
+        int count = 0;
+
+        while (temp != nullptr)
+        {
+            if (temp->data.name == name)
+            {
+                count++;
+                cout << "\nMatch " << count << endl;
+                cout << "-----------------\n";
+                displayContact(temp->data);
+            }
+
+            temp = temp->next;
+        }
+
+        if (count == 0)
+        {
+            cout << "No contact found with name \"" << name << "\".\n";
+        }
+        else
+        {
+            cout << "\nTotal matches found: " << count << endl;
+        }
+    }
+
+    void deleteContact(const string &name)
+    {
+        if (head == nullptr)
+        {
+            cout << "Contact list is empty.\n";
+            return;
+        }
+
+        int totalMatches = countContactsByName(name);
+
+        if (totalMatches == 0)
+        {
+            cout << "Contact not found.\n";
+            return;
+        }
+
+        if (totalMatches == 1)
+        {
+            Node *temp = head;
+            Node *prev = nullptr;
+
+            while (temp != nullptr)
+            {
+                if (temp->data.name == name)
+                {
+                    if (prev == nullptr)
+                    {
+                        head = temp->next;
+                    }
+                    else
+                    {
+                        prev->next = temp->next;
+                    }
+
+                    delete temp;
+                    cout << "Contact deleted successfully.\n";
+                    return;
+                }
+
+                prev = temp;
+                temp = temp->next;
+            }
+        }
+
+        cout << "\nMultiple contacts found with the name \""
+             << name << "\":\n";
+
+        Node *temp = head;
+        int matchNumber = 1;
+
+        while (temp != nullptr)
+        {
+            if (temp->data.name == name)
+            {
+                cout << "\n"
+                     << matchNumber << ".\n";
+                displayContact(temp->data);
+                matchNumber++;
+            }
+
+            temp = temp->next;
+        }
+
+        int choice;
+
+        cout << "\nEnter contact number to delete: ";
+        cin >> choice;
+
+        if (cin.fail() || choice < 1 || choice > totalMatches)
+        {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Invalid choice.\n";
+            return;
+        }
+
+        cin.ignore(10000, '\n');
+
+        temp = head;
+        Node *prev = nullptr;
+
+        matchNumber = 0;
+
+        while (temp != nullptr)
+        {
+            if (temp->data.name == name)
+            {
+                matchNumber++;
+
+                if (matchNumber == choice)
+                {
+                    if (prev == nullptr)
+                    {
+                        head = temp->next;
+                    }
+                    else
+                    {
+                        prev->next = temp->next;
+                    }
+
+                    delete temp;
+                    cout << "Contact deleted successfully.\n";
+                    return;
+                }
+            }
+
+            prev = temp;
+            temp = temp->next;
+        }
+    }
+
+    void updateContact(const string &name)
+    {
+        if (head == nullptr)
+        {
+            cout << "Contact list is empty.\n";
+            return;
+        }
+
+        int totalMatches = countContactsByName(name);
+
+        if (totalMatches == 0)
+        {
+            cout << "Contact not found.\n";
+            return;
+        }
+
+        Node *selected = nullptr;
+
+        if (totalMatches == 1)
+        {
+            Node *temp = head;
+
+            while (temp != nullptr)
+            {
+                if (temp->data.name == name)
+                {
+                    selected = temp;
+                    break;
+                }
+
+                temp = temp->next;
+            }
+        }
+        else
+        {
+            cout << "\nMultiple contacts found:\n";
+
+            Node *temp = head;
+            int number = 1;
+
+            while (temp != nullptr)
+            {
+                if (temp->data.name == name)
+                {
+                    cout << "\n"
+                         << number << ".\n";
+                    displayContact(temp->data);
+                    number++;
+                }
+
+                temp = temp->next;
+            }
+
+            int choice;
+
+            cout << "\nSelect contact to update: ";
+            cin >> choice;
+
+            if (cin.fail() || choice < 1 || choice > totalMatches)
+            {
+                cin.clear();
+                cin.ignore(10000, '\n');
+                cout << "Invalid choice.\n";
                 return;
             }
-            position++;
+
+            cin.ignore(10000, '\n');
+
+            temp = head;
+            number = 0;
+
+            while (temp != nullptr)
+            {
+                if (temp->data.name == name)
+                {
+                    number++;
+
+                    if (number == choice)
+                    {
+                        selected = temp;
+                        break;
+                    }
+                }
+
+                temp = temp->next;
+            }
+        }
+
+        Contact updated;
+
+        do
+        {
+            cout << "Enter New Name: ";
+            getline(cin, updated.name);
+        } while (!isValidName(updated.name));
+
+        while (true)
+        {
+            cout << "Enter New Phone: ";
+            getline(cin, updated.phone);
+
+            if (!isValidPhone(updated.phone))
+                continue;
+
+            if (hasDuplicatePhone(updated.phone, selected))
+            {
+                cout << "Another contact already uses this phone number.\n";
+                continue;
+            }
+
+            break;
+        }
+
+        while (true)
+        {
+            cout << "Enter New Email: ";
+            getline(cin, updated.email);
+
+            if (!isValidEmail(updated.email))
+                continue;
+
+            if (hasDuplicateEmail(updated.email, selected))
+            {
+                cout << "Another contact already uses this email.\n";
+                continue;
+            }
+
+            break;
+        }
+
+        Node *temp = head;
+        Node *prev = nullptr;
+
+        while (temp != selected)
+        {
+            prev = temp;
             temp = temp->next;
         }
-        cout << "Contact not found in list";
+
+        if (prev == nullptr)
+        {
+            head = selected->next;
+        }
+        else
+        {
+            prev->next = selected->next;
+        }
+
+        selected->data = updated;
+
+        if (head == nullptr ||
+            selected->data.name < head->data.name)
+        {
+            selected->next = head;
+            head = selected;
+        }
+        else
+        {
+            temp = head;
+
+            while (temp->next != nullptr &&
+                   temp->next->data.name <= selected->data.name)
+            {
+                temp = temp->next;
+            }
+
+            selected->next = temp->next;
+            temp->next = selected;
+        }
+
+        cout << "Contact updated successfully.\n";
     }
-    void deleteAtEnd()
-    {
-        if (head == nullptr)
-        {
-            cout << "List is empty";
-            return;
-        }
-        if (head->next == nullptr)
-        {
-            delete head;
-            head = nullptr;
-            cout << "Last Contact deleted";
-            return;
-        }
-        Node *temp = head;
 
-        while ((temp->next)->next != nullptr)
-        {
-            temp = temp->next;
-        }
-        delete temp->next;
-        temp->next = nullptr;
-
-        cout << "Last Contact deleted";
-    }
-    void deleteAtBeginning()
-    {
-        if (head == nullptr)
-        {
-            cout << "List is empty";
-            return;
-        }
-
-        Node *temp = head;
-        head = head->next;
-        delete temp;
-        cout << "First Contact deleted";
-    }
-    void deleteAtIndex(int position)
-    {
-        if (position < 1)
-        {
-            cout << "Position is invalid\n";
-            return;
-        }
-
-        if (position == 1)
-        {
-            deleteAtBeginning();
-            return;
-        }
-
-        Node *temp = head;
-
-        for (int i = 0; i < position - 2 && temp != nullptr; i++)
-        {
-            temp = temp->next;
-        }
-
-        if (temp == nullptr || temp->next == nullptr)
-        {
-            cout << "Position is invalid\n";
-            return;
-        }
-
-        Node *nodeToDelete = temp->next;
-        temp->next = nodeToDelete->next;
-
-        delete nodeToDelete;
-
-        displayAllContacts();
-    }
     void reverseList()
     {
         if (head == nullptr)
         {
-            cout << "List is empty";
+            cout << "Contact list is empty.\n";
             return;
         }
 
-        Node *curr = head;
         Node *prev = nullptr;
+        Node *current = head;
         Node *nextNode = nullptr;
 
-        while (curr != nullptr)
+        while (current != nullptr)
         {
-            nextNode = curr->next;
-            curr->next = prev;
-            prev = curr;
-            curr = nextNode;
+            nextNode = current->next;
+            current->next = prev;
+            prev = current;
+            current = nextNode;
         }
 
         head = prev;
-        displayAllContacts();
+
+        cout << "Contact list reversed successfully.\n";
+    }
+
+    ~ContactList()
+    {
+        Node *temp;
+
+        while (head != nullptr)
+        {
+            temp = head;
+            head = head->next;
+            delete temp;
+        }
     }
 };
 
-void readContact(Contact &data)
-{
-    cout << "Enter Name : ";
-    getline(cin, data.name);
-
-    cout << "Enter Phone : ";
-    getline(cin, data.phone);
-
-    cout << "Enter Email : ";
-    getline(cin, data.email);
-}
-
-void discardLine()
-{
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-}
-
 int main()
 {
-    int index = 1;
-
-    Contact data;
-
-    Contactlist linkList;
+    ContactList contactList;
+    int choice;
 
     do
     {
-        cout << "\nEfficient Contact Management System Using Linked Lists\n"
-             << "\nEnter 1 for Adding Contact At the Beginning"
-             << "\nEnter 2 for Adding Contact At the End"
-             << "\nEnter 3 for Adding Contact At the Specific Index"
-             << "\nEnter 4 for Displaying All Contacts"
-             << "\nEnter 5 for Searching an Contact"
-             << "\nEnter 6 for Deleting the first Contact"
-             << "\nEnter 7 for Deleting the last Contact"
-             << "\nEnter 8 for Deleting at an Index"
-             << "\nEnter 9 for Reversing A list"
-             << "\nEnter 0 to Exit" << endl;
+        cout << "CONTACT MANAGEMENT SYSTEM";
+        cout << "1. Add Contact\n";
+        cout << "2. Display All Contacts\n";
+        cout << "3. Search Contact\n";
+        cout << "4. Update Contact\n";
+        cout << "5. Delete Contact\n";
+        cout << "6. Reverse Contact List\n";
+        cout << "0. Exit\n";
+        cout << "=====================================\n";
+        cout << "Enter Choice: ";
 
-        cout << "Choice: ";
-        if (!(cin >> index))
+        if (!(cin >> choice))
         {
             cin.clear();
-            discardLine();
-            cout << "Invalid choice. Please enter a number between 0 and 9." << endl;
-            continue;
-        }
-        discardLine();
-        if (index < 0 || index > 9)
-        {
-            cout << "Invalid choice. Please enter a number between 0 and 9." << endl;
+            cin.ignore(10000, '\n');
+            cout << "Invalid input. Enter a number.\n";
             continue;
         }
 
-        switch (index)
-        {
-        case 0:
-            cout << "Exiting...\n";
-            break;
+        cin.ignore(10000, '\n');
 
+        switch (choice)
+        {
         case 1:
-            readContact(data);
-            if (linkList.insertAtBeginning(data))
-            {
-                cout << "Contact Added";
-            }
+            contactList.addContact();
             break;
-
         case 2:
-            readContact(data);
-            if (linkList.insertAtEnd(data))
-            {
-                cout << "Contact Added";
-            }
+            contactList.displayAllContacts();
             break;
-
         case 3:
         {
-            int position;
-            readContact(data);
-            cout << "Enter position to insert: ";
-            if (!(cin >> position))
-            {
-                cin.clear();
-                discardLine();
-                cout << "Position is invalid";
-            }
-            else if (position < 1)
-            {
-                cout << "Position is invalid";
-            }
-            else if (linkList.insertAtIndex(data, position))
-            {
-                cout << "Contact Added";
-            }
-            discardLine();
+            string name;
+            cout << "Enter name to search: ";
+            getline(cin, name);
+            contactList.search(name);
             break;
         }
-
         case 4:
-            linkList.displayAllContacts();
-            break;
-
-        case 5:
-            cout << "Enter the name of contact to search: ";
-            getline(cin, data.name);
-            linkList.search(data.name);
-            break;
-
-        case 6:
-            linkList.deleteAtBeginning();
-            break;
-
-        case 7:
-            linkList.deleteAtEnd();
-            break;
-
-        case 8:
         {
-            int position;
-            cout << "Enter position to delete: ";
-            if (!(cin >> position))
-            {
-                cin.clear();
-                discardLine();
-                cout << "Position is invalid";
-            }
-            else if (position < 1)
-            {
-                cout << "Position is invalid";
-            }
-            else
-            {
-                linkList.deleteAtIndex(position);
-            }
-            discardLine();
+            string name;
+            cout << "Enter name to update: ";
+            getline(cin, name);
+            contactList.updateContact(name);
             break;
         }
-
-        case 9:
-            linkList.reverseList();
+        case 5:
+        {
+            string name;
+            cout << "Enter name to delete: ";
+            getline(cin, name);
+            contactList.deleteContact(name);
             break;
-
+        }
+        case 6:
+            contactList.reverseList();
+            break;
+        case 0:
+            cout << "Exiting Contact Management System...\n";
+            break;
         default:
-            cout << "Invalid input.\n";
+            cout << "Invalid choice. Enter a number between 0 and 6.\n";
         }
 
-        cout << endl;
-
-    } while (index != 0);
+    } while (choice != 0);
 
     return 0;
 }

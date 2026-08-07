@@ -639,7 +639,6 @@ int main()
         cout << "5. Delete Contact\n";
         cout << "6. Reverse Contact List\n";
         cout << "0. Exit\n";
-        cout << "=====================================\n";
         cout << "Enter Choice: ";
 
         if (!(cin >> choice))
@@ -688,7 +687,7 @@ int main()
             contactList.reverseList();
             break;
         case 0:
-            cout << "Exiting Contact Management System...\n";
+            cout << "Exiting...\n";
             break;
         default:
             cout << "Invalid choice. Enter a number between 0 and 6.\n";

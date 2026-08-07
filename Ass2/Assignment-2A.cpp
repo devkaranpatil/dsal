@@ -102,27 +102,6 @@ public:
             temp = temp->next;
         }
     }
-    void updateValue(int oldValue, int newValue)
-    {
-        if (head == nullptr)
-        {
-            cout << "List is empty";
-            return;
-        }
-
-        Node *temp = head;
-        while (temp != nullptr)
-        {
-            if (temp->data == oldValue)
-            {
-                temp->data = newValue;
-                cout << "Node value updated";
-                return;
-            }
-            temp = temp->next;
-        }
-        cout << "Value not found in list";
-    }
     void search(int key)
     {
         if (head == nullptr)
@@ -269,7 +248,6 @@ int main()
              << "\nEnter 7 for Deleting the last node"
              << "\nEnter 8 for Deleting at an Index"
              << "\nEnter 9 for Reversing A list"
-             << "\nEnter 10 for Updating a node value"
              << "\nEnter 0 to Exit" << endl;
 
         cout << "Choice: ";
@@ -355,17 +333,6 @@ int main()
         case 9:
             linkList.reverseList();
             break;
-
-        case 10:
-        {
-            int oldValue, newValue;
-            cout << "Enter value to update: ";
-            cin >> oldValue;
-            cout << "Enter new value: ";
-            cin >> newValue;
-            linkList.updateValue(oldValue, newValue);
-            break;
-        }
 
         default:
             cout << "Invalid input.\n";

@@ -94,37 +94,18 @@ private:
 
     bool isValidEmail(const string &email) const
     {
-        size_t atPosition = email.find('@');
-        size_t dotPosition = email.rfind('.');
+        int at = email.find('@');
+        int dot = email.find('.', at);
 
-        if (atPosition == string::npos)
+        if (at <= 0)
         {
-            cout << "Email must contain '@'.\n";
+            cout << "Invalid email: missing '@'.\n";
             return false;
         }
 
-        if (email.find('@', atPosition + 1) != string::npos)
-        {
-            cout << "Email can contain only one '@'.\n";
-            return false;
-        }
-
-        if (atPosition == 0)
-        {
-            cout << "Email must contain characters before '@'.\n";
-            return false;
-        }
-
-        if (dotPosition == string::npos ||
-            dotPosition < atPosition + 2)
+        if (dot == string::npos || dot <= at + 1 || dot == email.length() - 1)
         {
             cout << "Invalid email domain.\n";
-            return false;
-        }
-
-        if (dotPosition == email.length() - 1)
-        {
-            cout << "Invalid email extension.\n";
             return false;
         }
 

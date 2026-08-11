@@ -170,7 +170,7 @@ public:
 
         Node *temp = head;
 
-        for (int i = 0; i < position - 2 && temp != nullptr; i++)
+        for (int i = 1; i < position - 1 && temp != nullptr; i++)
         {
             temp = temp->next;
         }

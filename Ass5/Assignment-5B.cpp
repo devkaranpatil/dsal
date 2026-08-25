@@ -8,17 +8,18 @@ public:
     string name;
     int rollNo;
     string branch;
-    string dob;
+    float cgpa;
 
     studentDetails() {}
-    studentDetails(string n, int r, string b, string d)
+    studentDetails(string n, int r, string b, float c)
     {
         name = n;
         rollNo = r;
         branch = b;
-        dob = d;
+        cgpa = c;
     }
 };
+
 class Node
 {
 public:
@@ -38,6 +39,14 @@ class list
 private:
     Node *head;
     Node *tail;
+
+    void displayNode(Node *Node)
+    {
+        cout << Node->data.rollNo << " ";
+        cout << Node->data.name << " ";
+        cout << Node->data.branch << " ";
+        cout << Node->data.cgpa << endl;
+    }
 
 public:
     list()
@@ -118,7 +127,7 @@ public:
             cout << temp->data.rollNo << " ";
             cout << temp->data.name << " ";
             cout << temp->data.branch << " ";
-            cout << temp->data.dob << endl;
+            cout << temp->data.cgpa << endl;
             temp = temp->next;
         }
     }
@@ -136,13 +145,14 @@ public:
         {
             if (temp->data.rollNo == key)
             {
-                cout << "Element of value " << key << " found at position " << position;
+                cout << "Student found" << endl;
+                displayNode(temp);
                 return;
             }
             position++;
             temp = temp->next;
         }
-        cout << "Element not found in list";
+        cout << "Student not found in list";
     }
     void searchByName(string key)
     {
@@ -158,13 +168,14 @@ public:
         {
             if (temp->data.name == key)
             {
-                cout << "Element of value " << key << " found at position " << position;
+                cout << "Student found" << endl;
+                displayNode(temp);
                 return;
             }
             position++;
             temp = temp->next;
         }
-        cout << "Element not found in list";
+        cout << "Student not found in list";
     }
     void deleteAtEnd()
     {
@@ -177,14 +188,14 @@ public:
         {
             delete head;
             head = tail = nullptr;
-            cout << "Last node deleted";
+            cout << "Student deleted";
             return;
         }
         Node *nodeToDelete = tail;
         tail = tail->prev;
         tail->next = nullptr;
         delete nodeToDelete;
-        cout << "Last node deleted";
+        cout << "Student deleted";
     }
     void deleteAtBeginning()
     {
@@ -199,13 +210,13 @@ public:
         {
             head = tail = nullptr;
             delete temp;
-            cout << "First node deleted";
+            cout << "Student deleted";
             return;
         }
         head = head->next;
         head->prev = nullptr;
         delete temp;
-        cout << "First node deleted";
+        cout << "Student deleted";
     }
     void deleteAtIndex(int position)
     {
@@ -281,8 +292,8 @@ void studentInput(studentDetails &data)
     cin >> data.rollNo;
     cout << "Enter Branch :";
     cin >> data.branch;
-    cout << "Enter Date of Birth :";
-    cin >> data.dob;
+    cout << "Enter Cgpa :";
+    cin >> data.cgpa;
 }
 int main()
 {

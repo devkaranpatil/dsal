@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 using namespace std;
 
 class Node
@@ -26,6 +27,16 @@ public:
     list()
     {
         head = nullptr;
+        tail = nullptr;
+    }
+    ~list()
+    {
+        while (head != nullptr)
+        {
+            Node *nodeToDelete = head;
+            head = head->next;
+            delete nodeToDelete;
+        }
         tail = nullptr;
     }
     void insertAtBeginning(int value)
@@ -116,13 +127,13 @@ public:
         {
             if (temp->data == key)
             {
-                cout << "Element of value " << key << " found at position " << position;
+                cout << "Linear search: element " << key << " found at position " << position;
                 return;
             }
             position++;
             temp = temp->next;
         }
-        cout << "Element not found in list";
+        cout << "Linear search: element " << key << " not found in the list";
     }
     void deleteAtEnd()
     {
@@ -251,7 +262,13 @@ int main()
              << "\nEnter 0 to Exit" << endl;
 
         cout << "Choice: ";
-        cin >> index;
+        if (!(cin >> index))
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid choice. Please enter a number.\n";
+            continue;
+        }
         if (index < 0 || index > 10)
         {
             cout << "Invalid choice. Please enter a number between 0 and 10." << endl;

@@ -79,18 +79,49 @@ public:
 int main()
 {
     Search s;
-    int key;
+    int choice, key;
 
-    s.input();
+    do
+    {
+        cout << "\nSearching Algorithms\n";
+        cout << "1. Input array\n";
+        cout << "2. Linear Search\n";
+        cout << "3. Binary Search\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    cout << "Enter element to search: ";
-    cin >> key;
+        switch (choice)
+        {
+        case 1:
+            s.input();
+            break;
 
-    cout << "\nLinear Search:\n";
-    s.search(key);
+        case 2:
 
-    cout << "\nBinary Search:\n";
-    s.binarySearch(key);
+            cout << "Enter element to search: ";
+            cin >> key;
+            cout << "\nLinear Search:\n";
+            s.search(key);
+            break;
+
+        case 3:
+
+            cout << "Enter element to search: ";
+            cin >> key;
+            cout << "\nBinary Search:\n";
+            s.binarySearch(key);
+            break;
+
+        case 4:
+            cout << "Exiting program.\n";
+            break;
+
+        default:
+            cout << "Invalid choice! Please try again.\n";
+            break;
+        }
+    } while (choice != 4);
 
     return 0;
 }

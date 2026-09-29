@@ -58,15 +58,6 @@ public:
     }
 
     bool isEmpty() { return top == nullptr; }
-
-    bool isFull()
-    {
-        Node *test = new (nothrow) Node(0);
-        if (test == nullptr)
-            return true;
-        delete test;
-        return false;
-    }
 };
 
 int main()
@@ -78,7 +69,7 @@ int main()
     do
     {
         cout << "\n--- Stack Menu (Linked List) ---\n";
-        cout << "1. Push\n2. Pop\n3. Peek\n4. Check Empty\n5.Check Full\n6.Exit\n ";
+        cout << "1. Push\n2. Pop\n3. Peek\n4.Exit\n ";
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -97,18 +88,12 @@ int main()
             cout << "Top element: " << s.peek() << endl;
             break;
         case 4:
-            cout << (s.isEmpty() ? "Stack is Empty\n" : "Stack is not Empty\n");
-            break;
-        case 5:
-            cout << (s.isFull() ? "Stack is Full\n" : "Stack is not Full\n");
-            break;
-        case 6:
             cout << "Exiting...\n";
             break;
         default:
             cout << "Invalid choice!\n";
         }
-    } while (choice != 6);
+    } while (choice != 5);
 
     return 0;
 }
